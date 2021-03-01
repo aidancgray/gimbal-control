@@ -76,7 +76,7 @@ def moveStage(command):
                 
 ### LED Control Method ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def LEDControl(led, dutycycle):
-        pi = pigpio.pi()
+        #pi = pigpio.pi()
 
         # Loop through list of LEDs to find which pin to use
         for i in range(len(LEDList)):
@@ -87,6 +87,7 @@ def LEDControl(led, dutycycle):
         #response = 'Setting '+ led + ' to ' + str(dutycycle) + '%'
         response = ''
         pi.set_PWM_dutycycle(pin, 255 * (float(dutycycle)/100))
+        
         return response
 
 ### LED Command Parser ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -120,9 +121,16 @@ def LEDParse(command):
 
                 for n in range(len(LEDList)):
                         if len(LEDList[n][0]) == 3:
-                                response = response + ' ' + LEDList[n][0] + ' | ' + str(LEDList[n][2]) + '%\n'
+                                response = response + ' ' + LEDList[n][0] + ' | ' + str(int(float(pi.get_PWM_dutycycle(LEDList[n][1])) / 2.55)) + '%\n'
                         else:
-                                response = response + LEDList[n][0] + ' | ' + str(LEDList[n][2]) + '%\n'
+                                response = response + LEDList[n][0] + ' | ' + str(int(float(pi.get_PWM_dutycycle(LEDList[n][1])) / 2.55)) + '%\n'
+                 
+                
+#                for n in range(len(LEDList)):
+#                        if len(LEDList[n][0]) == 3:
+#                                response = response + ' ' + LEDList[n][0] + ' | ' + str(LEDList[n][2]) + '%\n'
+#                        else:
+#                                response = response + LEDList[n][0] + ' | ' + str(LEDList[n][2]) + '%\n'
                         
         else:
                 response = 'BAD\n' + response + 'No LED specified'
@@ -210,7 +218,8 @@ class Stage:
 ### Main function ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if __name__ == "__main__":
         t = connect()
-
+        pi = pigpio.pi()
+        
         LEDs = ['635', '930', '970', '1050', '1070', '1085', '1200', '1300']
         LEDList = [['635', 23, 0],
                    ['930', 26, 0],
@@ -226,7 +235,7 @@ if __name__ == "__main__":
         ystage = Stage('Y-Axis', '2', '0', '14000', '30000', '100')
 
         # Create the server, binding to the Pi's local IP  on port 9999
-        HOST, PORT = "192.168.1.198", 9999
+        HOST, PORT = "192.168.1.12", 9999
         SocketServer.TCPServer.allow_reuse_address = True
         server = SocketServer.TCPServer((HOST, PORT), MyTCPHandler)
 
@@ -237,5 +246,6 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
                 print '...Closing server...'
                 server.shutdown()
+                pi.stop()
         except:
                 print 'Unknown Error'

@@ -1,7 +1,7 @@
 import socket
 import sys
 
-HOST, PORT = "192.168.1.198", 9999
+HOST, PORT = "192.168.1.50", 9999
 #data = " ".join(sys.argv[1:])
 
 print("Send commands below. Type Q to quit:")
