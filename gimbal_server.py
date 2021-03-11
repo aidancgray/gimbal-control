@@ -7,6 +7,13 @@
 # This is a Python 2.7 script for controlling the gimbal
 # system meant for the PFS project.
 #
+# EZHR17 Motor Controller for monochromator loses memory
+# after some time. Reinitialization must be done. This
+# will be implemented as soon as I get around to it. The
+# key settings are:
+#  - /1f1R (flip home flag polarity)
+#  - /1j4R (set to 1 microstep = 1/4 full step)
+#
 # -*- coding:utf-8 -*-
 
 import serial
@@ -330,7 +337,7 @@ class Stage:
 
 
 if __name__ == "__main__":
-        stageConn = connect("/dev/ttyUSB0")
+        #stageConn = connect("/dev/ttyUSB0")
         monoConn = connect("/dev/ttyUSB1")
 	pi = pigpio.pi()
         
