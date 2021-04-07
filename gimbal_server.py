@@ -7,7 +7,7 @@
 # This is a Python 2.7 script for controlling the gimbal
 # system meant for the PFS project.
 #
-# EZHR17 Motor Controller for monochromator loses memory
+# EZHR17 Motor Controller for the monochromator loses memory
 # after some time. Reinitialization must be done. This
 # will be implemented as soon as I get around to it. The
 # key settings are:
@@ -142,7 +142,7 @@ def MonoParse(command):
                 response = str(wavelengthGet) + '\n'
 
         elif command[1] == 'home':
-                n = monoConn.write('/1Z40000P438R\r')
+                n = monoConn.write('/1Z40000V200P447V800R\r')
                 time.sleep(0.1)
                 out = monoConn.readline()
                 
