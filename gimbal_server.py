@@ -174,23 +174,11 @@ def MonoParse(command):
 
 
 ### LED Control Method ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# def LEDControl(led, dutycycle):
-#         # Loop through list of LEDs to find which pin to use
-#         for i in range(len(LEDList)):
-#                 if led == LEDList[i][0]:
-#                         pin = LEDList[i][1]
-#                         LEDList[i][2] = dutycycle
-                        
-#         response = ''
-#         pi.set_PWM_dutycycle(pin, 255 * (float(dutycycle)/100))
-        
-#         return response
-
 def LEDControl(led, dutycycle):
         # If DC = 0, turn on all GPIO pins and set all to 0
         if int(dutycycle) == 0:
             for i in range(len(LEDList)):
-                pi.set_mode(LEDList[i][1], 1)
+                pi.set_mode(LEDList[i][1], pigpio.OUTPUT)  # set all pins to output mode
                 pi.set_PWM_dutycycle(LEDList[i][1], 0)
 
             response = ''
@@ -198,13 +186,13 @@ def LEDControl(led, dutycycle):
         else:
             # Loop through list of LEDs to find which pin to use
             for i in range(len(LEDList)):
-                # set all pins to output mode
-                pi.set_mode(LEDList[i][1], 0)
+                pi.set_mode(LEDList[i][1], pigpio.INPUT)  # set all pins to input mode
                 if led == LEDList[i][0]:
                     pin = LEDList[i][1]
                     LEDList[i][2] = dutycycle
                         
             response = ''
+            pi.set_mode(pin, pigpio.OUTPUT)
             pi.set_PWM_dutycycle(pin, 255 * (float(dutycycle)/100))
         
 
@@ -350,6 +338,8 @@ if __name__ == "__main__":
                    ['1085', 22, 0],
                    ['1200', 27, 0],
                    ['1300', 17, 0]]
+        
+        LEDControl('635', 0)  # Set all LEDs to 0 at startup
 
         # (Controller Name, EZHR Address, Current Location, Center Location, Positive Limit, Lower Limit)
         xstage = Stage('X-Axis', '1', '0', '33000', '60000', '100')
@@ -369,6 +359,7 @@ if __name__ == "__main__":
                 server.serve_forever()
         except KeyboardInterrupt:
                 print '...Closing server...'
+                LEDControl('635', 0)  # Turn off all LEDs on shutdown
                 server.shutdown()
                 pi.stop()
         except:
