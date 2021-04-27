@@ -8,12 +8,17 @@
 # system meant for the PFS project.
 #
 # EZHR17 Motor Controller for the monochromator loses memory
-# after some time. Reinitialization must be done. This
-# will be implemented as soon as I get around to it. The
+# after some time. Reinitialization must be done. The
 # key settings are:
 #  - /1f1R (flip home flag polarity)
 #  - /1j4R (set to 1 microstep = 1/4 full step)
 #
+# EZHR23 - Y Stage:
+#  - /2V500R (set velocity)
+#  - 
+#
+# EZHR23 - X Stage:
+#  - 
 # -*- coding:utf-8 -*-
 
 import serial
@@ -114,11 +119,26 @@ def MonoControl(wavelength):
         return response
 
 
+### Monochromator Power On/Off ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+def MonoPower(state):
+        if state == 1:
+                pi.set_mode(MonoGPIO, pigpio.OUTPUT)
+                pi.write(MonoGPIO, 1)
+                
+        elif state == 0:
+                pi.set_mode(MonoGPIO, pigpio.OUTPUT)
+                pi.write(MonoGPIO, 0)
+                pi.set_mode(MonoGPIO, pigpio.INPUT)
+                
+        else:
+                raise IOError('MonoPower accepts 1 or 0 as input')
+
+
 ### Monochromator Command Parser ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 def MonoParse(command):
         response = ''
 
-        if len(command) >= 2 and command[1] != '?' and command[1] != 'home' and command[1][0] != '/':
+        if len(command) >= 2 and command[1] != '?' and command[1] != 'home' and command[1] != 'on' and command[1] != 'off' and command[1][0] != '/':
                 monoCommand = command[1]
 
                 try:
@@ -139,7 +159,14 @@ def MonoParse(command):
 
                 monoPosition = out.split('`')[1].split('\x03')[0]  # strip output
                 wavelengthGet = round((float(monoPosition) - monoFit[1]) / monoFit[0], 2)  # convert to wavelength
-                response = str(wavelengthGet) + '\n'
+
+                monoPower = pi.read(MonoGPIO)
+                if monoPower == 0:
+                        response = 'OFF\n' + str(wavelengthGet) + '\n'
+                elif monoPower == 1:
+                        response = 'ON\n'  + str(wavelengthGet) + '\n'
+                else:
+                        response = 'NA\n'  + str(wavelengthGet) + '\n'
 
         elif command[1] == 'home':
                 n = monoConn.write('/1Z40000V200P447V800R\r')
@@ -155,6 +182,12 @@ def MonoParse(command):
                         else:
                                 time.sleep(0.1)
         
+        elif command[1] == 'on':
+                MonoPower(1)
+        
+        elif command[1] == 'off':
+                MonoPower(0)
+
         elif command[1][0] == '/':
                 response = manual('mono', command[1])
 
@@ -225,10 +258,6 @@ def LEDParse(command):
                 response = response + '-LED-|-Dutycycle-\n'
 
                 for n in range(len(LEDList)):
-                        # if len(LEDList[n][0]) == 3:
-                        #         response = response + ' ' + LEDList[n][0] + ' | ' + str(int(float(pi.get_PWM_dutycycle(LEDList[n][1])) / 2.55)) + '%\n'
-                        # else:
-                        #         response = response + LEDList[n][0] + ' | ' + str(int(float(pi.get_PWM_dutycycle(LEDList[n][1])) / 2.55)) + '%\n'   
                         try:
                             response = response + LEDList[n][0] + ' | ' + str(int(float(pi.get_PWM_dutycycle(LEDList[n][1])) / 2.55)) + '%\n'
                         except:
@@ -265,11 +294,6 @@ class MyTCPHandler(SocketServer.StreamRequestHandler):
                         elif command[0] == 'mono' and len(command) >= 2:
                                 response = MonoParse(command)
                         else:
-                                # response = 'BAD\nStart motor commands with \'/\'. \
-                                #         \nOr tell motor to move with \'move x y\' where x and y are real values. \
-                                #         \nHome stage using \'home x/y\' and choose either x or y. \
-                                #         \nControl the monochromator using \'mono wavelength\' where wavelength is in nm.'
-
                                 response = 'BAD\n'
                                 
                 if response[0:3] != 'BAD':
@@ -311,7 +335,7 @@ class Stage:
                                         time.sleep(0.1)
                                 
                 elif self.id == '2':
-                        stageConn.write(str.encode('/' + self.id + "v500"+ "Z30000" + "V1000" + "A" + self.home + "R" + "\r"))
+                        stageConn.write(str.encode('/' + self.id + "v500"+ "Z30000" + "V500" + "A" + self.home + "R" + "\r"))
                         while waitFlag:
                                 waitCheck2 = manual('stage', '/2Q')
 
@@ -325,10 +349,11 @@ class Stage:
 
 
 if __name__ == "__main__":
-        #stageConn = connect("/dev/ttyUSB0")
+        stageConn = connect("/dev/ttyUSB0")
         monoConn = connect("/dev/ttyUSB1")
 	pi = pigpio.pi()
         
+        MonoGPIO = 20
         LEDs = ['635', '930', '970', '1050', '1070', '1085', '1200', '1300']
         LEDList = [['635', 23, 0],
                    ['930', 26, 0],
@@ -342,8 +367,8 @@ if __name__ == "__main__":
         LEDControl('635', 0)  # Set all LEDs to 0 at startup
 
         # (Controller Name, EZHR Address, Current Location, Center Location, Positive Limit, Lower Limit)
-        xstage = Stage('X-Axis', '1', '0', '33000', '60000', '100')
-        ystage = Stage('Y-Axis', '2', '0', '14000', '30000', '100')
+        xstage = Stage('X-Axis', '1', '0', '33000', '60001', '99')
+        ystage = Stage('Y-Axis', '2', '0', '14000', '29001', '99')
 
         monoStepMode = 4.0  # 1/4 step mode for the monochromator
         monoFit = (4.003465 * monoStepMode, 109.8399 * monoStepMode)
@@ -360,6 +385,7 @@ if __name__ == "__main__":
         except KeyboardInterrupt:
                 print '...Closing server...'
                 LEDControl('635', 0)  # Turn off all LEDs on shutdown
+                MonoPower(0)  # Turn off Lamp to Monochromator
                 server.shutdown()
                 pi.stop()
         except:
