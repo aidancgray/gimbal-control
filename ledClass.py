@@ -29,7 +29,6 @@ class LED:
             self.piGPIO.set_mode(pin, pigpio.OUTPUT)
             self.piGPIO.set_PWM_dutycycle(pin, 255 * (float(dutycycle)/100))
         
-
         return response
 
     ### LED Command Parser ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -47,7 +47,15 @@ def multiStageMove(xMove, yMove):
                 else:
                         time.sleep(0.1)
 
-        response = responseX + '\n' + responseY
+        response = responseX + responseY
+        return response
+
+# Method for getting both stage statuses
+def multiStageStatus():
+        responseX = xstage.status()
+        responseY = ystage.status()
+        response = responseX + responseY
+
         return response
 
 ### TCP Server Class ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -67,11 +75,12 @@ class MyTCPHandler(SocketServer.StreamRequestHandler):
                                 response = stageConn.manual('stage', command[0])
                         elif command[0] == 'move' and len(command) == 3:
                                 response = multiStageMove(command[1], command[2])
-
                         elif command[0] == 'home' and command[1] == 'x':
                                 response = xstage.homeStage(stageConn)
                         elif command[0] == 'home' and command[1] == 'y':
                                 response = ystage.homeStage(stageConn)
+                        elif command[0] == 'stages' and command[1] == '?':
+                                response = multiStageStatus()
                         elif command[0] == 'led' and len(command) >= 2:
                                 response = LEDobj.LEDParse(command)
                         elif command[0] == 'mono' and len(command) >= 2:

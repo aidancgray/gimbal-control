@@ -90,3 +90,7 @@ class Stage:
                         response = out[4:len(out)-3] + '\n'
                 
                 return response
+        
+        def status(self):
+                response = self.axis + '=' + self.manual('/'+self.id+'?8')
+                return response

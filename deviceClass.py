@@ -27,6 +27,16 @@ class Device:
 			print t.portstr + ' is open...'
 			return t
 
+	### Write directly to the serial device
+	def write(self, writeData):
+		resp = self.devConn.write(writeData)
+		return resp
+
+	### read directly from the serial device
+	def readline(self):
+		resp = self.devConn.readline()
+		return resp
+
 	### Manual Control ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	def manual(self, device, command):
 		response = ''
