@@ -1,2 +1,3 @@
 *.old
 nohup.out
+.vscode/
