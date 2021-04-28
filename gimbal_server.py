@@ -369,7 +369,9 @@ if __name__ == "__main__":
         # (Controller Name, EZHR Address, Current Location, Center Location, Positive Limit, Lower Limit)
         xstage = Stage('X-Axis', '1', '0', '33000', '60001', '99')
         ystage = Stage('Y-Axis', '2', '0', '14000', '29001', '99')
-
+        
+        manual('stage', '/2m70R')  # Set the move-current to 70%.
+        
         monoStepMode = 4.0  # 1/4 step mode for the monochromator
         monoFit = (4.003465 * monoStepMode, 109.8399 * monoStepMode)
 
