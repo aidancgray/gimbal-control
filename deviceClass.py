@@ -51,8 +51,8 @@ class Device:
 			out = self.devConn.readline()
 		
 		if command[2] == 'Q':
-			response = out[:len(out)-3] + '\n'
+			response = out[:len(out)-3] + ';'
 		else:
-			response = out[4:len(out)-3] + '\n'
+			response = out[4:len(out)-3] + ';'
 		
 		return response

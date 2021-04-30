@@ -50,7 +50,7 @@ class Stage:
                 waitFlag = True
                 
                 if (int(position) >= int(self.pos)) or (int(position) <= int(self.neg)):
-                        response = 'BAD\n' + response + 'Position out of range\n'
+                        response = 'BAD;' + response + 'Position out of range;'
                         
                 else:
                         self.manual('/'+self.id+'A'+str(position)+'R')
@@ -70,7 +70,7 @@ class Stage:
                 response = ''
                 
                 if (int(position) >= int(self.pos)) or (int(position) <= int(self.neg)):
-                        response = 'BAD\n' + response + 'Position out of range\n'
+                        response = 'BAD;' + response + 'Position out of range;'
                         
                 else:
                         self.manual('/'+self.id+'A'+str(position)+'R')
@@ -85,9 +85,9 @@ class Stage:
                 out = self.devConn.readline()
                 
                 if command[2] == 'Q':
-                        response = out[:len(out)-3] + '\n'
+                        response = out[:len(out)-3]
                 else:
-                        response = out[4:len(out)-3] + '\n'
+                        response = out[4:len(out)-3]
                 
                 return response
         

@@ -39,7 +39,7 @@ class LED:
                 led = command[1]
 
                 if led not in self.LEDs:
-                        response = 'BAD\n' + response + 'Incorrect LED selection \n'
+                        response = 'BAD;' + response + 'Incorrect LED selection;'
                 else:
                         
                     if len(command) >= 3:
@@ -48,21 +48,19 @@ class LED:
                         if (0 <= int(dutycycle)) and (int(dutycycle) <= 100):
                             response = response
                         else:
-                            response = 'BAD\n' + response + 'Incorrect Dutycycle selection \n'
+                            response = 'BAD;' + response + 'Incorrect Dutycycle selection;'
                     else:
                         dutycycle = '50'
                             
                     response = response + self.LEDControl(led, dutycycle)
             
         elif command[1] == '?':
-            response = response + '-LED-|-Dutycycle-\n'
-
             for n in range(len(self.LEDList)):
                 try:
-                    response = response + self.LEDList[n][0] + ' | ' + str(int(float(self.piGPIO.get_PWM_dutycycle(self.LEDList[n][1])) / 2.55)) + '%\n'
+                    response = response + self.LEDList[n][0] + '=' + str(int(float(self.piGPIO.get_PWM_dutycycle(self.LEDList[n][1])) / 2.55)) + '%;'
                 except:
-                    response = response + self.LEDList[n][0] + ' | ' + '0' + '%\n'                 
+                    response = response + self.LEDList[n][0] + '=' + '0' + '%;'                 
         else:
-            response = 'BAD\n' + response + 'No LED specified'
+            response = 'BAD;' + response + 'No LED specified;'
         
         return response

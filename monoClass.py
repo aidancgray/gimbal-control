@@ -55,10 +55,10 @@ class Mono:
                 if wavelengthSet >= 0 and wavelengthSet <= 1750:
                     response = self.MonoControl(wavelengthSet)
                 else:
-                    response = 'BAD\n' + response + 'wavelength range: 0-1750nm'
+                    response = 'BAD;' + response + 'wavelength range: 0-1750nm;'
 
             except ValueError:
-                response = 'BAD\n' + response + 'command structure is: mono [wavelength in nm]'
+                response = 'BAD;' + response + 'command structure is: mono [wavelength in nm];'
 
         elif command[1] == '?':
             self.devConn.write('/1?0' + '\r')  # query monochromator position 
@@ -70,11 +70,11 @@ class Mono:
 
             monoPower = self.piGPIO.read(self.MonoGPIO)
             if monoPower == 0:
-                response = 'OFF\n' + str(wavelengthGet) + '\n'
+                response = 'OFF;' + str(wavelengthGet) + ';'
             elif monoPower == 1:
-                response = 'ON\n'  + str(wavelengthGet) + '\n'
+                response = 'ON;'  + str(wavelengthGet) + ';'
             else:
-                response = 'NA\n'  + str(wavelengthGet) + '\n'
+                response = 'NA;'  + str(wavelengthGet) + ';'
 
         elif command[1] == 'home':
             self.devConn.write('/1Z40000V200P447V800R\r')
@@ -109,7 +109,7 @@ class Mono:
                     time.sleep(0.1)
 
         else:
-            response = 'BAD\n' + response + 'No wavelength specified'
+            response = 'BAD;' + response + 'No wavelength specified'
         
         return response
     
@@ -121,8 +121,8 @@ class Mono:
         out = self.devConn.readline()
         
         if command[2] == 'Q':
-            response = out[:len(out)-3] + '\n'
+            response = out[:len(out)-3] + ';'
         else:
-            response = out[4:len(out)-3] + '\n'
+            response = out[4:len(out)-3] + ';'
         
         return response

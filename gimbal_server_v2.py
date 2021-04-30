@@ -48,14 +48,14 @@ def multiStageMove(xMove, yMove):
                         time.sleep(0.1)
 
         response = responseX + responseY
+        response = response.replace('\n',';')
         return response
 
 # Method for getting both stage statuses
 def multiStageStatus():
         responseX = xstage.status()
         responseY = ystage.status()
-        response = responseX + responseY
-
+        response = responseX + ';' + responseY + ';'
         return response
 
 ### TCP Server Class ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -113,8 +113,8 @@ if __name__ == "__main__":
         LEDobj.LEDControl('635', 0)  # Set all LEDs to 0 at startup
 
         # (Controller Name, EZHR Address, Current Location, Center Location, Positive Limit, Lower Limit)
-        xstage = Stage('X-Axis', '1', '0', '33000', '60001', '99', stageConn)
-        ystage = Stage('Y-Axis', '2', '0', '14000', '29001', '99', stageConn)
+        xstage = Stage('X', '1', '0', '33000', '60001', '99', stageConn)
+        ystage = Stage('Y', '2', '0', '14000', '29001', '99', stageConn)
 
         xstage.manual('/2m70R')  # Set the move-current to 70%.
 
