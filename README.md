@@ -1,7 +1,17 @@
 # Software for running the 'Gimbalator' System for PFS.
 
-```gimbal_server.py``` is the old version.
-```gimbal_server_v2.py``` is the new version.
+```gimbal_server_v2.py``` is the newest version.
+
+The pigpio daemon starts as a system process upon boot-up.
+
+Connect via port 9999.
+
+## Things to note:
+- Two different LEDs cannot be run simultaneously.
+- An LED and the Monochromator CAN be run simultaneously. Ensure one is off before using the other (unless desired).
+- Motor controllers lose telemetry upon power loss. Although power loss is unlikely, homing can and should be done upon each new measurement run.
+- Homing is done at a very slow speed to ensure repeatability.
+- Turn off monochromator lamp ```mono off``` when not in use for extended periods of time. (Don't burn out the lamp!) 
   
 ## Command Set
 
