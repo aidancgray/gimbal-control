@@ -9,7 +9,7 @@ Connect via port 9999.
 ## Things to note:
 - Two different LEDs cannot be run simultaneously.
 - An LED and the Monochromator CAN be run simultaneously. Ensure one is off before using the other (unless desired).
-- Motor controllers lose telemetry upon power loss. Although power loss is unlikely, homing can and should be done upon each new measurement run.
+- Motor controllers lose telemetry upon power loss. Although power loss is unlikely, homing can and should be done upon each new measurement run; this includes the monochromator.
 - Homing is done at a very slow speed to ensure repeatability.
 - Turn off monochromator lamp ```mono off``` when not in use for extended periods of time. (Don't burn out the lamp!) 
   
