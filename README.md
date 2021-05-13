@@ -15,7 +15,7 @@ Connect via port 9999.
   
 ## Command Set
 
-| Command           | Args                  | Return                           | Description                                 |
+| Command           | Arg(s)                | Return                           | Description                                 |
 |      :----:       |       :----:          |              :----:              |                                         ---:|
 |-- Monochromator --|-----------------------|----------------------------------|---------------------------------------------|
 | mono              | ?                     | on/off;wavelength;OK             | Query status                                |
