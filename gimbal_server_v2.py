@@ -32,6 +32,9 @@ from stageClass import Stage
 from monoClass import Mono
 from ledClass import LED
 
+X_MICROSTEP = 32
+Y_MICROSTEP = 64
+
 # Method for moving the 2 stages in parallel
 def multiStageMove(xMove, yMove):
         responseX = xstage.moveStage_NB(xMove)
@@ -113,10 +116,10 @@ if __name__ == "__main__":
         LEDobj.LEDControl('635', 0)  # Set all LEDs to 0 at startup
 
         # (Controller Name, EZHR Address, Current Location, Center Location, Positive Limit, Lower Limit)
-        xstage = Stage('X', '1', '0', '33000', '60001', '99', stageConn)
-        ystage = Stage('Y', '2', '0', '14000', '29001', '99', stageConn)
+        xstage = Stage('X', '1', X_MICROSTEP, '0', 66000, 120002, 198, stageConn)
+        ystage = Stage('Y', '2', Y_MICROSTEP, '0', 28000, 58002, 198, stageConn)
 
-        xstage.manual('/2m70R')  # Set the move-current to 70%.
+        ystage.manual('/2m70R')  # Set the move-current to 70%.
 
         monochromator = Mono(pi, 20, monoConn, 4.0) # Create monochromator object
 

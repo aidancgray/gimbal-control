@@ -9,39 +9,38 @@ import time
 ### neg: the location of the negative position
 ### devConn: holds the connection to the motor controller(s)
 class Stage:
-        def __init__(self, axis, id, loc, home, pos, neg, devConn):
+        def __init__(self, axis, id, microstep_mode, loc, home, pos, neg, devConn):
                 self.axis = axis
                 self.id = id
+                self.microstep_mode = microstep_mode
                 self.loc = loc
-                self.home = home
-                self.pos = pos
-                self.neg = neg
+                self.home = home / self.microstep_mode
+                self.pos = pos / self.microstep_mode
+                self.neg = neg / self.microstep_mode
                 self.devConn = devConn
+
+                self.manual('/' + self.id + 'j' + self.microstep_mode + 'R')
 
         def homeStage(self, stageConn):
                 response = "Homing the " + self.axis + " axis"
                 waitFlag = True
                 
                 if self.id == '1':
-                        self.devConn.write(str.encode('/' + self.id + "v1000"+ "Z60000" + "V1000" + "A" + self.home + "R" + "\r"))
-                        while waitFlag:
-                                waitCheck1 = self.manual('/1Q')
-
-                                if waitCheck1[3] == '`':
-                                        waitFlag = False
-                                else:
-                                        time.sleep(0.1)
+                        homeSpeed = 2000 / self.microstep_mode
+                        homeLimit = 120000 / self.microstep_mode
                                 
                 elif self.id == '2':
-                        self.devConn.write(str.encode('/' + self.id + "v500"+ "Z30000" + "V500" + "A" + self.home + "R" + "\r"))
-                        while waitFlag:
-                                waitCheck2 = self.manual('/2Q')
+                        homeSpeed = 1000 / self.microstep_mode
+                        homeLimit = 60000 / self.microstep_mode
 
-                                if waitCheck2[3] == '`':
-                                        waitFlag = False
-                                else:
-                                        time.sleep(0.1)
-                        
+                self.devConn.write(str.encode('/' + self.id + 'v' + homeSpeed + 'Z' + homeLimit + 'V' + homeSpeed + "A" + self.home + "R" + "\r"))
+                while waitFlag:
+                        waitCheck1 = self.manual('/' + self.id + 'Q')
+
+                        if waitCheck1[3] == '`':
+                                waitFlag = False
+                        else:
+                                time.sleep(0.1)
                 time.sleep(0.1)
                 return response
 
