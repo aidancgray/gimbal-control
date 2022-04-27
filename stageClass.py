@@ -9,31 +9,30 @@ import time
 ### neg: the location of the negative position
 ### devConn: holds the connection to the motor controller(s)
 class Stage:
-        def __init__(self, axis, id, microstep_mode, loc, home, pos, neg, devConn):
+        def __init__(self, axis, id, microstepMode, moveCurrent, holdCurrent, startVelocity, maxVelocity, home, posLimit, negLimit, devConn):
                 self.axis = axis
                 self.id = id
-                self.microstep_mode = microstep_mode
-                self.loc = loc
-                self.home = home / self.microstep_mode
-                self.pos = pos / self.microstep_mode
-                self.neg = neg / self.microstep_mode
+                self.microstepMode = microstepMode
+                self.moveCurrent = moveCurrent
+                self.holdCurrent = holdCurrent
+                self.startVelocity = startVelocity * self.microstepMode
+                self.maxVelocity = maxVelocity * self.microstepMode
+                self.home = home * self.microstepMode
+                self.pos = posLimit * self.microstepMode
+                self.neg = negLimit * self.microstepMode
                 self.devConn = devConn
 
-                self.manual('/' + self.id + 'j' + self.microstep_mode + 'R')
+                self.manual('/' + self.id + 'j' + self.microstepMode + 'R')
+                self.manual('/' + self.id + 'm' + self.moveCurrent + 'R')
+                self.manual('/' + self.id + 'h' + self.holdCurrent + 'R')
+                self.manual('/' + self.id + 'v' + self.startVelocity + 'R')
+                self.manual('/' + self.id + 'V' + self.maxVelocity + 'R')
 
         def homeStage(self, stageConn):
                 response = "Homing the " + self.axis + " axis"
                 waitFlag = True
-                
-                if self.id == '1':
-                        homeSpeed = 2000 / self.microstep_mode
-                        homeLimit = 120000 / self.microstep_mode
-                                
-                elif self.id == '2':
-                        homeSpeed = 1000 / self.microstep_mode
-                        homeLimit = 60000 / self.microstep_mode
 
-                self.devConn.write(str.encode('/' + self.id + 'v' + homeSpeed + 'Z' + homeLimit + 'V' + homeSpeed + "A" + self.home + "R" + "\r"))
+                self.devConn.write(str.encode('/' + self.id + 'v' + self.maxVelocity + 'Z' + self.pos + 'V' + self.maxVelocity + "A" + self.home + "R" + "\r"))
                 while waitFlag:
                         waitCheck1 = self.manual('/' + self.id + 'Q')
 

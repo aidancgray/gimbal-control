@@ -32,8 +32,16 @@ from stageClass import Stage
 from monoClass import Mono
 from ledClass import LED
 
+### Stage Variables ###
 X_MICROSTEP = 32
 Y_MICROSTEP = 64
+
+X_MOVE_CURRENT = 30
+Y_MOVE_CURRENT = 70
+
+X_HOLD_CURRENT = 12
+Y_HOLD_CURRENT = 12
+########################
 
 # Method for moving the 2 stages in parallel
 def multiStageMove(xMove, yMove):
@@ -99,7 +107,7 @@ class MyTCPHandler(SocketServer.StreamRequestHandler):
 if __name__ == "__main__":
         stageConn = Device("/dev/ttyUSB0")
         monoConn = Device("/dev/ttyUSB1")
-	pi = pigpio.pi()
+        pi = pigpio.pi()
 
         LEDs = ['635', '930', '970', '1050', '1070', '1085', '1200', '1300']
         LEDList = [['635', 23, 0],
@@ -115,11 +123,9 @@ if __name__ == "__main__":
 
         LEDobj.LEDControl('635', 0)  # Set all LEDs to 0 at startup
 
-        # (Controller Name, EZHR Address, Current Location, Center Location, Positive Limit, Lower Limit)
-        xstage = Stage('X', '1', X_MICROSTEP, '0', 66000, 120002, 198, stageConn)
-        ystage = Stage('Y', '2', Y_MICROSTEP, '0', 28000, 58002, 198, stageConn)
-
-        ystage.manual('/2m70R')  # Set the move-current to 70%.
+        # (Controller Name, EZHR Address, Microstep mode, Move Current, Hold Current, Start Velocity, Max Velocity, Center Location, Positive Limit, Lower Limit)
+        xstage = Stage('X', '1', X_MICROSTEP, X_MOVE_CURRENT, X_HOLD_CURRENT, 400, 500, 16500, 30001, 49, stageConn)
+        ystage = Stage('Y', '2', Y_MICROSTEP, Y_MOVE_CURRENT, Y_HOLD_CURRENT, 200, 250, 7000, 14501, 49, stageConn)
 
         monochromator = Mono(pi, 20, monoConn, 4.0) # Create monochromator object
 
