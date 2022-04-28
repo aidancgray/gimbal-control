@@ -15,39 +15,99 @@ class Stage:
                 self.microstepMode = microstepMode
                 self.moveCurrent = moveCurrent
                 self.holdCurrent = holdCurrent
-                self.startVelocity = startVelocity * self.microstepMode
-                self.maxVelocity = maxVelocity * self.microstepMode
-                self.home = home * self.microstepMode
-                self.pos = posLimit * self.microstepMode
-                self.neg = negLimit * self.microstepMode
+
+                if startVelocity > 2500:
+                        self.startVelocity = 2500
+                elif startVelocity < 200:
+                        self.startVelocity = 200
+                else:
+                        self.startVelocity = startVelocity
+
+                if maxVelocity > 10000:
+                        self.maxVelocity = 10000
+                elif maxVelocity < 50:
+                        self.maxVelocity = 50
+                else:                
+                        self.maxVelocity = maxVelocity 
+                
+                self.startVelocity_MS = 0
+                self.maxVelocity_MS = 0
+                
+                self.home = home * 2
+                self.pos = posLimit
+                self.neg = negLimit
                 self.devConn = devConn
 
-                self.manual('/' + self.id + 'j' + self.microstepMode + 'R')
-                self.manual('/' + self.id + 'm' + self.moveCurrent + 'R')
-                self.manual('/' + self.id + 'h' + self.holdCurrent + 'R')
-                self.manual('/' + self.id + 'v' + self.startVelocity + 'R')
-                self.manual('/' + self.id + 'V' + self.maxVelocity + 'R')
+                self.manual('/' + self.id + 'm' + str(self.moveCurrent) + 'R')
+                self.manual('/' + self.id + 'h' + str(self.holdCurrent) + 'R')
 
-        def homeStage(self, stageConn):
-                response = "Homing the " + self.axis + " axis"
+                self.changeMicrostepMode(self.microstepMode)
+
+        def changeMicrostepMode(self, microstepMode):
+                try:
+                        msMode = int(microstepMode)
+                except:
+                        return 'BAD; Microstep Mode must be 2, 4, 8, 16, 32, 64, 128, or 256;'
+                
+                if msMode == 2 or msMode == 4 or msMode == 8 or msMode == 16 or msMode == 32 or msMode == 64 or msMode == 128 or msMode == 256:
+                        self.microstepMode = msMode
+                        
+                        if self.startVelocity * self.microstepMode > 2500:
+                                self.startVelocity_MS = 2500
+                        elif self.startVelocity * self.microstepMode < 200:
+                                self.startVelocity_MS = 200
+                        else:
+                                self.startVelocity_MS = self.startVelocity * self.microstepMode
+                        
+                        if self.maxVelocity * self.microstepMode > 10000:
+                                self.maxVelocity_MS = 10000
+                        elif self.maxVelocity * self.microstepMode < 50:
+                                self.maxVelocity_MS = 50
+                        else:                
+                                self.maxVelocity_MS = self.maxVelocity * self.microstepMode
+
+                        self.pos_MS = self.pos * self.microstepMode
+                        self.neg_MS = self.neg * self.microstepMode
+
+                        self.manual('/' + self.id + 'j' + str(self.microstepMode) + 'R')
+                        self.manual('/' + self.id + 'v' + str(self.startVelocity_MS) + 'R')
+                        self.manual('/' + self.id + 'V' + str(self.maxVelocity_MS) + 'R')
+
+                        return ''
+                else:
+                        return 'BAD; Microstep Mode must be 2, 4, 8, 16, 32, 64, 128, or 256;'
+
+        def homeStage(self):
+                response = "Homing the " + self.axis + " axis;"
                 waitFlag = True
-
-                self.devConn.write(str.encode('/' + self.id + 'v' + self.maxVelocity + 'Z' + self.pos + 'V' + self.maxVelocity + "A" + self.home + "R" + "\r"))
+                homeSpeed = str(self.maxVelocity * 2)
+                homeLimit = str(self.pos * 2)
+                
+                self.manual('/' + self.id + 'j2' + 'R')
+                self.manual('/' + self.id + 'v' + homeSpeed + 'R')
+                self.manual('/' + self.id + 'Z' + homeLimit + 'V' + homeSpeed + 'A' + str(self.home) + 'R')
+                time.sleep(0.1)
+                
                 while waitFlag:
                         waitCheck1 = self.manual('/' + self.id + 'Q')
 
                         if waitCheck1[3] == '`':
                                 waitFlag = False
+                                time.sleep(0.1)
                         else:
                                 time.sleep(0.1)
-                time.sleep(0.1)
+                
+                self.manual('/' + self.id + 'j' + str(self.microstepMode) + 'R')
+                self.manual('/' + self.id + 'v' + str(self.startVelocity_MS) + 'R')
+                self.manual('/' + self.id + 'V' + str(self.maxVelocity_MS) + 'R')
+                
                 return response
 
         def moveStage(self, position):
                 response = ''
                 waitFlag = True
                 
-                if (int(position) >= int(self.pos)) or (int(position) <= int(self.neg)):
+                if (int(position) >= int(self.pos_MS)) or (int(position) <= int(self.neg_MS)):
                         response = 'BAD;' + response + 'Position out of range;'
                         
                 else:
@@ -67,7 +127,7 @@ class Stage:
         def moveStage_NB(self, position):
                 response = ''
                 
-                if (int(position) >= int(self.pos)) or (int(position) <= int(self.neg)):
+                if (int(position) >= int(self.pos_MS)) or (int(position) <= int(self.neg_MS)):
                         response = 'BAD;' + response + 'Position out of range;'
                         
                 else:

@@ -36,7 +36,7 @@ from ledClass import LED
 X_MICROSTEP = 32
 Y_MICROSTEP = 64
 
-X_MOVE_CURRENT = 30
+X_MOVE_CURRENT = 70
 Y_MOVE_CURRENT = 70
 
 X_HOLD_CURRENT = 12
@@ -87,15 +87,19 @@ class MyTCPHandler(SocketServer.StreamRequestHandler):
                         elif command[0] == 'move' and len(command) == 3:
                                 response = multiStageMove(command[1], command[2])
                         elif command[0] == 'home' and command[1] == 'x':
-                                response = xstage.homeStage(stageConn)
+                                response = xstage.homeStage()
                         elif command[0] == 'home' and command[1] == 'y':
-                                response = ystage.homeStage(stageConn)
+                                response = ystage.homeStage()
                         elif command[0] == 'stages' and command[1] == '?':
                                 response = multiStageStatus()
                         elif command[0] == 'led' and len(command) >= 2:
                                 response = LEDobj.LEDParse(command)
                         elif command[0] == 'mono' and len(command) >= 2:
                                 response = monochromator.MonoParse(command)
+                        elif command[0] == 'microstep' and command[1] == 'x' and len(command) == 3:
+                                response = xstage.changeMicrostepMode(command[2])
+                        elif command[0] == 'microstep' and command[1] == 'y' and len(command) == 3:
+                                response = ystage.changeMicrostepMode(command[2])
                         else:
                                 response = 'BAD\n'
                                 
