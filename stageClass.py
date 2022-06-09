@@ -37,7 +37,13 @@ class Stage:
                 self.pos = posLimit
                 self.neg = negLimit
                 self.devConn = devConn
+                
+                if self.axis == 'X':
+                        self.manual('/' + self.id + 'n2f1R')
+                elif self.axis == 'Y':
+                        self.manual('/' + self.id + 'n0f0R')
 
+                self.manual('/' + self.id + 'L1R')
                 self.manual('/' + self.id + 'm' + str(self.moveCurrent) + 'R')
                 self.manual('/' + self.id + 'h' + str(self.holdCurrent) + 'R')
 
@@ -80,12 +86,14 @@ class Stage:
         def homeStage(self):
                 response = "Homing the " + self.axis + " axis;"
                 waitFlag = True
-                homeSpeed = str(self.maxVelocity * 2)
+                homeSpeed = str(2500)
+                fastMoveSpeed = str(self.maxVelocity_MS)
                 homeLimit = str(self.pos * 2)
                 
+                # Set microstepping mode to 2x and change speeds
                 self.manual('/' + self.id + 'j2' + 'R')
                 self.manual('/' + self.id + 'v' + homeSpeed + 'R')
-                self.manual('/' + self.id + 'Z' + homeLimit + 'V' + homeSpeed + 'A' + str(self.home) + 'R')
+                self.manual('/' + self.id + 'Z' + homeLimit + 'R')
                 time.sleep(0.1)
                 
                 while waitFlag:
@@ -96,7 +104,11 @@ class Stage:
                                 time.sleep(0.1)
                         else:
                                 time.sleep(0.1)
-                
+
+                # Center up
+                self.manual('/' + self.id + 'V' + fastMoveSpeed + 'A' + str(self.home) + 'R')
+
+                # Reconfigure microstepping parameters
                 self.manual('/' + self.id + 'j' + str(self.microstepMode) + 'R')
                 self.manual('/' + self.id + 'v' + str(self.startVelocity_MS) + 'R')
                 self.manual('/' + self.id + 'V' + str(self.maxVelocity_MS) + 'R')

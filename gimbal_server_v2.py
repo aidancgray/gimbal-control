@@ -20,6 +20,7 @@
 # EZHR23 - X Stage:
 #  - 
 # -*- coding:utf-8 -*-
+from __future__ import print_function
 
 import serial
 import time
@@ -33,14 +34,14 @@ from monoClass import Mono
 from ledClass import LED
 
 ### Stage Variables ###
-X_MICROSTEP = 32
-Y_MICROSTEP = 64
+X_MICROSTEP = 2
+Y_MICROSTEP = 2
 
 X_MOVE_CURRENT = 70
 Y_MOVE_CURRENT = 70
 
-X_HOLD_CURRENT = 12
-Y_HOLD_CURRENT = 12
+X_HOLD_CURRENT = 70
+Y_HOLD_CURRENT = 70
 ########################
 
 # Method for moving the 2 stages in parallel
@@ -128,8 +129,8 @@ if __name__ == "__main__":
         LEDobj.LEDControl('635', 0)  # Set all LEDs to 0 at startup
 
         # (Controller Name, EZHR Address, Microstep mode, Move Current, Hold Current, Start Velocity, Max Velocity, Center Location, Positive Limit, Lower Limit)
-        xstage = Stage('X', '1', X_MICROSTEP, X_MOVE_CURRENT, X_HOLD_CURRENT, 400, 500, 16500, 30001, 49, stageConn)
-        ystage = Stage('Y', '2', Y_MICROSTEP, Y_MOVE_CURRENT, Y_HOLD_CURRENT, 200, 250, 7000, 14501, 49, stageConn)
+        xstage = Stage('X', '1', X_MICROSTEP, X_MOVE_CURRENT, X_HOLD_CURRENT, 100, 3500, 156500, 313000, 49, stageConn)
+        ystage = Stage('Y', '2', Y_MICROSTEP, Y_MOVE_CURRENT, Y_HOLD_CURRENT, 100, 3500, 170000, 390000, 49, stageConn)
 
         monochromator = Mono(pi, 20, monoConn, 4.0) # Create monochromator object
 
@@ -143,10 +144,10 @@ if __name__ == "__main__":
         try:
                 server.serve_forever()
         except KeyboardInterrupt:
-                print '...Closing server...'
+                print('...Closing server...')
                 LEDobj.LEDControl('635', 0)  # Turn off all LEDs on shutdown
                 monochromator.MonoPower(0)  # Turn off Lamp to Monochromator
                 server.shutdown()
                 pi.stop()
         except:
-                print 'Unknown Error'
+                print('Unknown Error')
