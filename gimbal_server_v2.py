@@ -129,8 +129,8 @@ if __name__ == "__main__":
         LEDobj.LEDControl('635', 0)  # Set all LEDs to 0 at startup
 
         # (Controller Name, EZHR Address, Microstep mode, Move Current, Hold Current, Start Velocity, Max Velocity, Center Location, Positive Limit, Lower Limit)
-        xstage = Stage('X', '1', X_MICROSTEP, X_MOVE_CURRENT, X_HOLD_CURRENT, 100, 3500, 156500, 313000, 49, stageConn)
-        ystage = Stage('Y', '2', Y_MICROSTEP, Y_MOVE_CURRENT, Y_HOLD_CURRENT, 100, 3500, 170000, 390000, 49, stageConn)
+        xstage = Stage('X', '1', X_MICROSTEP, X_MOVE_CURRENT, X_HOLD_CURRENT, 100, 3500, 156000, 313000, 49, stageConn)
+        ystage = Stage('Y', '2', Y_MICROSTEP, Y_MOVE_CURRENT, Y_HOLD_CURRENT, 100, 3500, 194500, 390000, 49, stageConn)
 
         monochromator = Mono(pi, 20, monoConn, 4.0) # Create monochromator object
 

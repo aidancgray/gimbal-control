@@ -41,7 +41,7 @@ class Stage:
                 if self.axis == 'X':
                         self.manual('/' + self.id + 'n2f1R')
                 elif self.axis == 'Y':
-                        self.manual('/' + self.id + 'n0f0R')
+                        self.manual('/' + self.id + 'n2f0R')
 
                 self.manual('/' + self.id + 'L1R')
                 self.manual('/' + self.id + 'm' + str(self.moveCurrent) + 'R')
